@@ -439,6 +439,8 @@ void TinyLoRa::RFM_Write(unsigned char RFM_Address, unsigned char RFM_Data)
 
   //Set NSS pin High to end communication
   digitalWrite(_cs, HIGH);
+
+  SPI.endTransaction();
 }
 
 /**************************************************************************/
@@ -460,6 +462,8 @@ uint8_t TinyLoRa::RFM_Read(uint8_t RFM_Address) {
     uint8_t RFM_Data = SPI.transfer(0x00);
     
     digitalWrite(_cs, HIGH);
+
+    SPI.endTransaction();
       // br: SPI Transfer Debug
     #ifdef DEBUG
       Serial.print("SPI Read ADDR: ");
