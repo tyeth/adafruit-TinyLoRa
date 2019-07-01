@@ -150,7 +150,6 @@ const unsigned char PROGMEM TinyLoRa::S_Table[16][16] = {
 */
 /**************************************************************************/
 void TinyLoRa::setDatarate(rfm_datarates_t datarate) {
-  _sf, _bw, _modemcfg = 0;
   switch(datarate) {
     case SF7BW125:
       _sf = 0x74;
@@ -202,7 +201,9 @@ void TinyLoRa::setDatarate(rfm_datarates_t datarate) {
 */
 /**************************************************************************/
 void TinyLoRa::setChannel(rfm_channels_t channel) {
-  _rfmMSB, _rfmLSB, _rfmMID = 0;
+  _rfmMSB = 0;
+  _rfmLSB = 0;
+  _rfmMID = 0;
   switch (channel)
   {
     case CH0:
@@ -339,10 +340,10 @@ bool TinyLoRa::begin()
   RFM_Write(0x0F,0x00);
 
   // init frame counter
-  uint16_t frameCounter = 0x0000;
+  frameCounter = 0x0000;
 
   // init tx random number for first use
-  uint8_t txrandomNum = 0x00;
+  txrandomNum = 0x00;
   return 1;
 }
 
