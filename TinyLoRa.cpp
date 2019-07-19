@@ -271,11 +271,14 @@ void TinyLoRa::setChannel(rfm_channels_t channel) {
               The RFM module's interrupt pin (rfm_nss).
     @param    rfm_nss
               The RFM module's slave select pin (rfm_nss).
+    @param    rfm_rst
+              The RFM module's reset pin (rfm_rst).
 */
 /**************************************************************************/
-TinyLoRa::TinyLoRa(int8_t rfm_irq, int8_t rfm_nss) {
+TinyLoRa::TinyLoRa(uint8_t rfm_irq, uint8_t rfm_nss, uint8_t rfm_rst) {
   _irq = rfm_irq;
   _cs = rfm_nss;
+  _rst = rfm_rst;
 }
 
 /***************************************************************************
@@ -295,16 +298,29 @@ bool TinyLoRa::begin()
   // start and configure SPI
   SPI.begin();
   
-  // RFM95 ss as output
+  // RFM _cs as output
   pinMode(_cs, OUTPUT);
 
-  // RFM95 _irq as input
+  // RFM _irq as input
   pinMode(_irq, INPUT);
 
-  uint8_t ver = RFM_Read(0x42);
-  if(ver!=18){
+  // RFM _rst as output
+  pinMode(_rst, OUTPUT);
+
+  // Reset the RFM radio module
+  digitalWrite(_rst, LOW);
+
+  delay(0.1);
+
+  digitalWrite(_rst, HIGH);
+
+  delay(5);
+
+  // Reset the radio module on init
+
+  uint8_t ver = RFM_Read(REG_VER);
+  if(ver != RFM9x_VER)
     return 0;
-  }
   
   //Switch RFM to sleep
   RFM_Write(0x01,MODE_SLEEP);
@@ -420,7 +436,6 @@ void TinyLoRa::RFM_Send_Package(unsigned char *RFM_Tx_Package, unsigned char Pac
 /**************************************************************************/
 void TinyLoRa::RFM_Write(unsigned char RFM_Address, unsigned char RFM_Data) 
 {
-  // br: SPI Transfer Debug
   #ifdef DEBUG
     Serial.print("SPI Write ADDR: ");
     Serial.print(RFM_Address, HEX);
@@ -465,7 +480,7 @@ uint8_t TinyLoRa::RFM_Read(uint8_t RFM_Address) {
     digitalWrite(_cs, HIGH);
 
     SPI.endTransaction();
-      // br: SPI Transfer Debug
+
     #ifdef DEBUG
       Serial.print("SPI Read ADDR: ");
       Serial.print(RFM_Address, HEX);

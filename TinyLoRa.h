@@ -74,6 +74,8 @@ typedef enum rfm_datarates
 //#define AU915 ///< Used in Australia
 //#define AS920 ///< Used in Asia
 
+#define RFM9x_VER   0x12 ///<Expected RFM9x RegVersion
+
 /* RFM Modes */
 #define MODE_SLEEP  0x00  ///<low-power mode
 #define MODE_LORA   0x80  ///<LoRa operating mode
@@ -90,6 +92,7 @@ typedef enum rfm_datarates
 #define REG_FEI_LSB                0x1E ///<Info from Prev. Header
 #define REG_FEI_MSB                0x1D ///<Number of received bytes
 #define REG_MODEM_CONFIG           0x26 ///<Modem configuration register
+#define REG_VER                    0x42 ///<RFM9x version register
 
 /**************************************************************************/
 /*! 
@@ -103,13 +106,13 @@ class TinyLoRa
 		uint16_t frameCounter;  ///<frame counter
     void setChannel(rfm_channels_t channel);
     void setDatarate(rfm_datarates_t datarate);
-    TinyLoRa(int8_t rfm_dio0, int8_t rfm_nss);
+    TinyLoRa(uint8_t rfm_dio0, uint8_t rfm_nss, uint8_t rfm_rst);
 		bool begin(void);
 		void sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx);
 
 	private:
 		uint8_t randomNum;
-		int8_t _cs, _irq;
+		uint8_t _cs, _irq, _rst;
     bool _isMultiChan;
     unsigned char _rfmMSB, _rfmMID, _rfmLSB, _sf, _bw, _modemcfg;
     static const unsigned char LoRa_Frequency[8][3];
