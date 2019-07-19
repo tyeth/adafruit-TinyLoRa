@@ -106,13 +106,13 @@ class TinyLoRa
 		uint16_t frameCounter;  ///<frame counter
     void setChannel(rfm_channels_t channel);
     void setDatarate(rfm_datarates_t datarate);
-    TinyLoRa(uint8_t rfm_dio0, uint8_t rfm_nss, uint8_t rfm_rst);
+    TinyLoRa(int8_t rfm_dio0, int8_t rfm_nss, int8_t rfm_rst);
 		bool begin(void);
 		void sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx);
 
 	private:
 		uint8_t randomNum;
-		uint8_t _cs, _irq, _rst;
+		int8_t _cs, _irq, _rst;
     bool _isMultiChan;
     unsigned char _rfmMSB, _rfmMID, _rfmLSB, _sf, _bw, _modemcfg;
     static const unsigned char LoRa_Frequency[8][3];

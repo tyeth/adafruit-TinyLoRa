@@ -275,7 +275,7 @@ void TinyLoRa::setChannel(rfm_channels_t channel) {
               The RFM module's reset pin (rfm_rst).
 */
 /**************************************************************************/
-TinyLoRa::TinyLoRa(uint8_t rfm_irq, uint8_t rfm_nss, uint8_t rfm_rst) {
+TinyLoRa::TinyLoRa(int8_t rfm_irq, int8_t rfm_nss, int8_t rfm_rst) {
   _irq = rfm_irq;
   _cs = rfm_nss;
   _rst = rfm_rst;
@@ -303,6 +303,9 @@ bool TinyLoRa::begin()
 
   // RFM _irq as input
   pinMode(_irq, INPUT);
+
+  if (_rst < 0)
+    return 0;
 
   // RFM _rst as output
   pinMode(_rst, OUTPUT);
