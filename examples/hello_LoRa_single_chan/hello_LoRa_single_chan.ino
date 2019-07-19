@@ -32,10 +32,10 @@ unsigned char loraData[11] = {"hello LoRa"};
 const unsigned int sendInterval = 30;
 
 // Pinout for Feather 32u4 LoRa
-TinyLoRa lora = TinyLoRa(7, 8);
+TinyLoRa lora = TinyLoRa(7, 8, 4);
 
 // Pinout for Feather M0 LoRa
-//TinyLoRa lora = TinyLoRa(3, 8);
+//TinyLoRa lora = TinyLoRa(3, 8, 4);
 
 void setup()
 {
