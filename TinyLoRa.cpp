@@ -304,20 +304,19 @@ bool TinyLoRa::begin()
   // RFM _irq as input
   pinMode(_irq, INPUT);
 
-  if (_rst < 0)
-    return 0;
+  if (_rst > 0){
+    // RFM _rst as output
+    pinMode(_rst, OUTPUT);
 
-  // RFM _rst as output
-  pinMode(_rst, OUTPUT);
+    // Reset the RFM radio module
+    digitalWrite(_rst, LOW);
 
-  // Reset the RFM radio module
-  digitalWrite(_rst, LOW);
+    delay(0.1);
 
-  delay(0.1);
+    digitalWrite(_rst, HIGH);
 
-  digitalWrite(_rst, HIGH);
-
-  delay(5);
+    delay(5);
+  }
 
   // Reset the radio module on init
 
