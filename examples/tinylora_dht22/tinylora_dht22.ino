@@ -42,9 +42,6 @@ TinyLoRa lora = TinyLoRa(7, 8, 4);
 #define DHTPIN 10
 DHT dht(DHTPIN, DHT22);
 
-// Pinout for Adafruit Feather M0 LoRa
-//TinyLoRa lora = TinyLoRa(3, 8);
-
 void setup()
 {
   delay(2000);
