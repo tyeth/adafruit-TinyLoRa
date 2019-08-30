@@ -500,9 +500,11 @@ uint8_t TinyLoRa::RFM_Read(uint8_t RFM_Address) {
               Frame counter for transfer frames.
     @param    Data_Length
               Length of data to be sent.
+    @param    Frame_Port
+              Number of frame port
 */
 /**************************************************************************/
-void TinyLoRa::sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx)
+void TinyLoRa::sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx, uint8_t Frame_Port)
 {
   
   //Define variables
@@ -520,7 +522,6 @@ void TinyLoRa::sendData(unsigned char *Data, unsigned char Data_Length, unsigned
   unsigned char Mac_Header = 0x40;
 
   unsigned char Frame_Control = 0x00;
-  unsigned char Frame_Port = 0x01;
 
   //make a copy of Data
   unsigned char tmpData[Data_Length];
