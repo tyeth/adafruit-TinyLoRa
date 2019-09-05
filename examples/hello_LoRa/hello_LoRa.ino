@@ -65,6 +65,9 @@ void loop()
 {
   Serial.println("Sending LoRa Data...");
   lora.sendData(loraData, sizeof(loraData), lora.frameCounter);
+  // Optionally set the Frame Port (1 to 255)
+  // uint8_t framePort = 1;
+  // lora.sendData(loraData, sizeof(loraData), lora.frameCounter, framePort);
   Serial.print("Frame Counter: ");Serial.println(lora.frameCounter);
   lora.frameCounter++;
 
