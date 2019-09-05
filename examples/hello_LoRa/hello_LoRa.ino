@@ -8,7 +8,6 @@
 // Copyright 2015, 2016 Ideetron B.V.
 //
 // Modified by Brent Rubell for Adafruit Industries, 2018
-// Added FramePort by clavisound for Adafruit Industries, Aug 2019
 /************************** Configuration ***********************************/
 #include <TinyLoRa.h>
 #include <SPI.h>
@@ -31,9 +30,6 @@ unsigned char loraData[11] = {"hello LoRa"};
 
 // How many times data transfer should occur, in seconds
 const unsigned int sendInterval = 30;
-
-// In which port we send data? [TTN supports 0-255, 1 is default]
-uint8_t framePort = 1;
 
 // Pinout for Adafruit Feather 32u4 LoRa
 TinyLoRa lora = TinyLoRa(7, 8, 4);
@@ -70,6 +66,7 @@ void loop()
   Serial.println("Sending LoRa Data...");
   lora.sendData(loraData, sizeof(loraData), lora.frameCounter);
   // Optionally set the Frame Port (1 to 255)
+  // uint8_t framePort = 1;
   // lora.sendData(loraData, sizeof(loraData), lora.frameCounter, framePort);
   Serial.print("Frame Counter: ");Serial.println(lora.frameCounter);
   lora.frameCounter++;

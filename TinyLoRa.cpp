@@ -501,7 +501,7 @@ uint8_t TinyLoRa::RFM_Read(uint8_t RFM_Address) {
     @param    Data_Length
               Length of data to be sent.
     @param    Frame_Port
-              Number of frame port
+              Frame port to send data from, from 0 to 225.
 */
 /**************************************************************************/
 void TinyLoRa::sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx, uint8_t Frame_Port)
