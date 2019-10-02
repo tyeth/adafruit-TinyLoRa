@@ -37,10 +37,9 @@
 #define TINY_LORA_H
 
 #include <Arduino.h>
-#ifdef ARDUINO_ARCH_AVR
+#if defined(ARDUINO_ARCH_AVR)
   #include <avr/pgmspace.h>
-#endif
-#ifdef ARDUINO_ARCH_ESP32
+#elif defined(ARDUINO_ARCH_ESP32)
   #include <pgmspace.h>
 #endif
 
