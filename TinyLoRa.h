@@ -37,7 +37,9 @@
 #define TINY_LORA_H
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
+#ifdef (__AVR__)
+  #include <avr/pgmspace.h>
+#endif // defined (__AVR__)
 
 // uncomment for debug output
 // #define DEBUG
