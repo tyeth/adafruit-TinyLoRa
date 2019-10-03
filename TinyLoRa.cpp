@@ -371,47 +371,30 @@ bool TinyLoRa::begin()
     @param Tx_Power How much TX power in dBm
 */
 /**************************************************************************/
-// user can give dBm from -4 to +20, default 17
-// 18-19dBm are undefined in doc but maybe possible. Here are ignored.
-// Chip works with three modes. This function offer less granularity.
+// Valid values in dBm are: -80, +1 to +17 and +20.
 //
-// Example: user selects -1dBm this function selects -.6dBm via
-// pa: 0, opower: 0, mpower: 6.
-
-/* First option is pa_boost = 0 OutputPower = 0. We select MaxPower 5
-pa: 0 opower: 0 mpower: 0 dBm: -4.20
-pa: 0 opower: 0 mpower: 1 dBm: -3.60
-pa: 0 opower: 0 mpower: 2 dBm: -3.00
-pa: 0 opower: 0 mpower: 3 dBm: -2.40
-pa: 0 opower: 0 mpower: 4 dBm: -1.80
-pa: 0 opower: 0 mpower: 5 dBm: -1.20
-pa: 0 opower: 0 mpower: 6 dBm: -0.60
-pa: 0 opower: 0 mpower: 7 dBm: 0.00
-
-But in reality the dBm's in this set are -100dB with pa_boost = 0
-*/
+// 18-19dBm are undefined in doc but maybe possible. Here are ignored.
+// Chip works with three modes. This function offer granularity of 1dBm
+// but the chips is capable of more.
+//
+// -4.2 to 0 is in reality -84 to -80dBm
 
 void TinyLoRa::setPower(int8_t Tx_Power) { 
 
-  // values to packed in one byte
+  // values to be packed in one byte
   bool PaBoost;
   int8_t OutputPower; // 0-15
   int8_t MaxPower; // 0-7
 
-  // this value goes to the register
+  // this value goes to the register (packed bytes)
   uint8_t DataPower;
 
-  // 1st range -4.2 to 0dBm 
-  // formula to find the MaxPower.
-  if ( Tx_Power < -4 ) { // force -4.2dBm, no need to calculate
+  // 1st possibility -80
+  if ( Tx_Power == -80 ) { // force -80dBm (lower power)
     PaBoost = 0;
     MaxPower = 0;
     OutputPower = 0;
-  } else if ( Tx_Power >= -4 && Tx_Power < 0 ) {
-    PaBoost = 0;
-    MaxPower = (Tx_Power / -0.6 - 7.8) * -1; // * -1 invert negative number to positive
-  // 2nd range 1 to 17dBm 
-  // formula to find the OutputPower.
+  // 2nd possibility: range 1 to 17dBm 
   } else if ( Tx_Power >= 0 && Tx_Power < 2 ) { // assume 1 db is given.
     PaBoost = 1;
     MaxPower = 7;
@@ -419,11 +402,12 @@ void TinyLoRa::setPower(int8_t Tx_Power) {
   } else if ( Tx_Power >= 2 && Tx_Power <=17 ) {
     PaBoost = 1;
     MaxPower = 7;
+    // formula to find the OutputPower.
     OutputPower = Tx_Power - 2;
   }
 
   // 3rd possibility. 20dBm. Special case
-  // Max Antenna VSWR 3:1, Duty Cycle <1% or destroyed chip
+  // Max Antenna VSWR 3:1, Duty Cycle <1% or destroyed(?) chip
   if ( Tx_Power == 20 ) {
     PaBoost = 1;
     OutputPower = 15;
@@ -437,8 +421,8 @@ void TinyLoRa::setPower(int8_t Tx_Power) {
   // Pack the above data to one byte and send it to HOPE RFM9x
   DataPower = (PaBoost << 7) + (MaxPower << 4) + OutputPower;
   	
-  //PA pin (default value is 0x4F (DEC 79, 3dBm) from HOPE, 0xFF (DEC 255 / 17dBm) from adafruit).
-   RFM_Write(REG_PA_CONFIG,DataPower);
+  //PA pin. Default value is 0x4F (DEC 79, 3dBm) from HOPE, 0xFF (DEC 255 / 17dBm) from adafruit.
+  RFM_Write(REG_PA_CONFIG,DataPower);
 }
 
 
@@ -578,7 +562,7 @@ uint8_t TinyLoRa::RFM_Read(uint8_t RFM_Address) {
     @param    Data_Length
               Length of data to be sent.
     @param    Frame_Port
-              Number of frame port
+              Frame port to send data from, from 0 to 225.
 */
 /**************************************************************************/
 void TinyLoRa::sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx, uint8_t Frame_Port)

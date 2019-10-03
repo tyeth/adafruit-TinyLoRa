@@ -37,7 +37,11 @@
 #define TINY_LORA_H
 
 #include <Arduino.h>
-#include <avr/pgmspace.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <avr/pgmspace.h>
+#elif defined(ARDUINO_ARCH_ESP32)
+  #include <pgmspace.h>
+#endif
 
 // uncomment for debug output
 // #define DEBUG
@@ -105,23 +109,23 @@ class TinyLoRa
 	public:
 		uint8_t txrandomNum;  ///<random number for AES
 		uint16_t frameCounter;  ///<frame counter
-    void setChannel(rfm_channels_t channel);
-    void setDatarate(rfm_datarates_t datarate);
-    void setPower(int8_t Tx_Power = 17);
-    TinyLoRa(int8_t rfm_dio0, int8_t rfm_nss, int8_t rfm_rst);
+		void setChannel(rfm_channels_t channel);
+		void setDatarate(rfm_datarates_t datarate);
+		void setPower(int8_t Tx_Power = 17);
+		TinyLoRa(int8_t rfm_dio0, int8_t rfm_nss, int8_t rfm_rst);
 		bool begin(void);
 		void sendData(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter_Tx, uint8_t Frame_Port = 1);
 
 	private:
 		uint8_t randomNum;
 		int8_t _cs, _irq, _rst;
-    bool _isMultiChan;
-    unsigned char _rfmMSB, _rfmMID, _rfmLSB, _sf, _bw, _modemcfg;
-    static const unsigned char LoRa_Frequency[8][3];
+		bool _isMultiChan;
+		unsigned char _rfmMSB, _rfmMID, _rfmLSB, _sf, _bw, _modemcfg;
+		static const unsigned char LoRa_Frequency[8][3];
 		static const unsigned char S_Table[16][16];
 		void RFM_Send_Package(unsigned char *RFM_Tx_Package, unsigned char Package_Length);
 		void RFM_Write(unsigned char RFM_Address, unsigned char RFM_Data);
-    uint8_t RFM_Read(uint8_t RFM_Address);
+		uint8_t RFM_Read(uint8_t RFM_Address);
 		void Encrypt_Payload(unsigned char *Data, unsigned char Data_Length, unsigned int Frame_Counter, unsigned char Direction);
 		void Calculate_MIC(unsigned char *Data, unsigned char *Final_MIC, unsigned char Data_Length, unsigned int Frame_Counter, unsigned char Direction);
 		void Generate_Keys(unsigned char *K1, unsigned char *K2);
