@@ -58,6 +58,14 @@ void setup()
     Serial.println("Check your radio");
     while(true);
   }
+
+  // Optional set transmit power. If not set default is +17 dBm.
+  // Valid options are: -80, 1 to 17, 20 (dBm).
+  // For safe operation in 20dBm: your antenna must be 3:1 VWSR or better
+  // and respect the 1% duty cycle.
+
+  // lora.setPower(17);
+
   Serial.println("OK");
 }
 

@@ -91,7 +91,7 @@ const unsigned char PROGMEM TinyLoRa::LoRa_Frequency[8][3] = {
 const unsigned char PROGMEM TinyLoRa::LoRa_Frequency[8][3] = {
 	{ 0xE1, 0xF9, 0xC0 },		//Channel 0 903.900 MHz / 61.035 Hz = 14809536 = 0xE1F9C0
 	{ 0xE2, 0x06, 0x8C },		//Channel 1 904.100 MHz / 61.035 Hz = 14812812 = 0xE2068C
-	{ 0xE2, 0x13, 0x59},		//Channel 2 904.300 MHz / 61.035 Hz = 14816089 = 0xE21359
+	{ 0xE2, 0x13, 0x59 },		//Channel 2 904.300 MHz / 61.035 Hz = 14816089 = 0xE21359
 	{ 0xE2, 0x20, 0x26 },		//Channel 3 904.500 MHz / 61.035 Hz = 14819366 = 0xE22026
 	{ 0xE2, 0x2C, 0xF3 },		//Channel 4 904.700 MHz / 61.035 Hz = 14822643 = 0xE22CF3
 	{ 0xE2, 0x39, 0xC0 },		//Channel 5 904.900 MHz / 61.035 Hz = 14825920 = 0xE239C0
@@ -292,7 +292,7 @@ TinyLoRa::TinyLoRa(int8_t rfm_irq, int8_t rfm_nss, int8_t rfm_rst) {
      @return True if the RFM has been initialized
  */
  /**************************************************************************/
-bool TinyLoRa::begin() 
+bool TinyLoRa::begin()
 {
 
   // start and configure SPI
@@ -330,7 +330,7 @@ bool TinyLoRa::begin()
   //Set RFM in LoRa mode
   RFM_Write(0x01,MODE_LORA);
 
-  //PA pin (maximal power)
+  //PA pin (maximal power, 17dBm)
   RFM_Write(0x09,0xFF);
 
   //Rx Timeout set to 37 symbols
@@ -364,6 +364,67 @@ bool TinyLoRa::begin()
   txrandomNum = 0x00;
   return 1;
 }
+
+/**************************************************************************/
+/*! 
+    @brief Sets the TX power
+    @param Tx_Power How much TX power in dBm
+*/
+/**************************************************************************/
+// Valid values in dBm are: -80, +1 to +17 and +20.
+//
+// 18-19dBm are undefined in doc but maybe possible. Here are ignored.
+// Chip works with three modes. This function offer granularity of 1dBm
+// but the chips is capable of more.
+//
+// -4.2 to 0 is in reality -84 to -80dBm
+
+void TinyLoRa::setPower(int8_t Tx_Power) { 
+
+  // values to be packed in one byte
+  bool PaBoost;
+  int8_t OutputPower; // 0-15
+  int8_t MaxPower; // 0-7
+
+  // this value goes to the register (packed bytes)
+  uint8_t DataPower;
+
+  // 1st possibility -80
+  if ( Tx_Power == -80 ) { // force -80dBm (lower power)
+    PaBoost = 0;
+    MaxPower = 0;
+    OutputPower = 0;
+  // 2nd possibility: range 1 to 17dBm 
+  } else if ( Tx_Power >= 0 && Tx_Power < 2 ) { // assume 1 db is given.
+    PaBoost = 1;
+    MaxPower = 7;
+    OutputPower = 1;
+  } else if ( Tx_Power >= 2 && Tx_Power <=17 ) {
+    PaBoost = 1;
+    MaxPower = 7;
+    // formula to find the OutputPower.
+    OutputPower = Tx_Power - 2;
+  }
+
+  // 3rd possibility. 20dBm. Special case
+  // Max Antenna VSWR 3:1, Duty Cycle <1% or destroyed(?) chip
+  if ( Tx_Power == 20 ) {
+    PaBoost = 1;
+    OutputPower = 15;
+    MaxPower = 7;
+    RFM_Write(REG_PA_DAC, 0x87); // only for +20dBm probably with 0x86,0x85 = 19,18dBm
+  } else {
+    // Setting for non +20dBm power
+    RFM_Write(REG_PA_DAC, 0x84);
+  }
+
+  // Pack the above data to one byte and send it to HOPE RFM9x
+  DataPower = (PaBoost << 7) + (MaxPower << 4) + OutputPower;
+  	
+  //PA pin. Default value is 0x4F (DEC 79, 3dBm) from HOPE, 0xFF (DEC 255 / 17dBm) from adafruit.
+  RFM_Write(REG_PA_CONFIG,DataPower);
+}
+
 
 /**************************************************************************/
 /*!
