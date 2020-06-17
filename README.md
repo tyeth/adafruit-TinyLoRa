@@ -1,5 +1,4 @@
-# Adafruit TinyLoRa Library [![Build Status](https://travis-ci.com/adafruit/TinyLoRa.svg?branch=master)](https://travis-ci.com/adafruit/TinyLoRa)
-
+# Adafruit TinyLoRa Library [![Build Status](https://github.com/adafruit/Adafruit_TinyLoRa/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/Adafruit_TinyLoRa/actions)[![Documentation](https://github.com/adafruit/ci-arduino/blob/master/assets/doxygen_badge.svg)](http://adafruit.github.io/TinyLoRa/html/index.html)
 
 Library for communicating with [The Things Network](https://www.thethingsnetwork.org/) using a Hope RF RFM95/96/97/98(W) LoRa Transceiver Module.
 
